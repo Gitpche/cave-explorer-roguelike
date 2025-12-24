@@ -63,7 +63,7 @@ class SimpleCave:
 
         if self.depth % 15 == 0:
             self.timer = 40
-            self.message = "\033[41m⚠️ НЕСТАБИЛЬНАЯ ЗОНА! УСПЕЙ ВЫЙТИ! ⚠️\033[0m"
+            self.message = "\033[41⚠️ НЕСТАБИЛЬНАЯ ЗОНА! УСПЕЙ ВЫЙТИ! ⚠️\033[0m"
         else:
             self.timer = -1
 
