@@ -5,6 +5,12 @@ import msvcrt
 
 class SimpleCave:
     def __init__(self, width=30, height=15):
+        seed_value = input("Введите сид (или пусто для рандома): ")
+        if seed_value:
+            random.seed(seed_value)
+        else:
+            pass
+
         os.system("")
         self.width = width
         self.height = height
@@ -153,9 +159,6 @@ class SimpleCave:
 
         if self.monsters_activated: self.move_enemies()
         if self.health <= 0:
-            if os.path.exists("savegame.json"):
-                os.remove("savegame.json")
-
             print("\n\033[31m" + "Ы" * 50 + "\nВЫ ПОГИБЛИ!\033[0m")
             input()
             exit()
