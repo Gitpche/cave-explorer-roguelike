@@ -65,7 +65,8 @@ class SimpleCave:
                 if not floor_tiles: break
                 mx, my = random.choice(floor_tiles)
                 if (mx, my) != (self.px, self.py):
-                    self.enemies.append([mx, my])
+                    m_type = "O" if random.random() < 0.2 else "X"
+                    self.enemies.append([mx, my, m_type])
 
         if self.depth % 15 == 0:
             self.timer = 40
@@ -100,13 +101,14 @@ class SimpleCave:
         self.max_health += 5
         self.health = self.max_health
         self.artifacts_collected += 1
+        self.depth += 1
         self.generate_level()
         self.message = f"\033[33m⭐ АРТЕФАКТ! Макс. HP увеличено до {self.max_health}!\033[0m"
-        self.depth += 1
 
     def move_enemies(self):
         for i in range(len(self.enemies)):
-            ex, ey = self.enemies[i]
+            ex, ey, m_type = self.enemies[i]
+
             dx = 1 if ex < self.px else -1 if ex > self.px else 0
             dy = 1 if ey < self.py else -1 if ey > self.py else 0
             nx, ny = ex + dx, ey + dy
@@ -114,8 +116,8 @@ class SimpleCave:
             if nx == self.px and ny == self.py:
                 self.health -= self.monster_damage
                 self.message = f"\033[31m💥 Монстр укусил вас! -{self.monster_damage} HP\033[0m"
-            elif self.map[ny][nx] == "." and [nx, ny] not in self.enemies:
-                self.enemies[i] = [nx, ny]
+            elif self.map[ny][nx] == "." and not any(en[0] == nx and en[1] == ny for en in self.enemies):
+                self.enemies[i] = [nx, ny, m_type]
 
     def move(self, dx, dy):
         self.message = ""
@@ -129,10 +131,19 @@ class SimpleCave:
 
         nx, ny = self.px + dx, self.py + dy
         if 0 <= nx < self.width and 0 <= ny < self.height:
-            if [nx, ny] in self.enemies:
-                self.enemies.remove([nx, ny])
-                self.slimes.append([nx, ny])
-                self.message = "\033[31m⚔️ Монстр убит!\033[0m \033[32mВыпала слизь.\033[0m"
+            if [nx, ny, 'X'] in self.enemies or [nx, ny, 'O'] in self.enemies:
+                target = next(en for en in self.enemies if en[0] == nx and en[1] == ny)
+                m_type = target[2]
+
+                self.enemies.remove(target)
+
+                if m_type == "O":
+                    for _ in range(4): self.slimes.append([nx, ny])
+                    self.message = "\033[32m✨ ГИГАНТСКИЙ СЛИЗЕНЬ РАЗОРВАН! +4 слизи!\033[0m"
+                else:
+                    self.slimes.append([nx, ny])
+                    self.message = "\033[31m⚔️ Монстр убит!\033[0m"
+
                 if random.random() > 0.4:
                     self.health -= self.monster_damage
             elif [nx, ny] in self.slimes:
@@ -197,8 +208,12 @@ class SimpleCave:
                 tile = self.map[y][x]
                 if x == self.px and y == self.py:
                     row += "\033[35m@\033[0m"
-                elif [x, y] in self.enemies:
-                    row += "\033[31mX\033[0m"
+                elif any(en[0] == x and en[1] == y for en in self.enemies):
+                    m_type = next(en[2] for en in self.enemies if en[0] == x and en[1] == y)
+                    if m_type == "O":
+                        row += "\033[1;32mO\033[0m"
+                    else:
+                        row += "\033[31mX\033[0m"
                 elif [x, y] in self.slimes:
                     row += "\033[32mo\033[0m"
                 elif [x, y] in self.traps:
