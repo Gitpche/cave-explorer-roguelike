@@ -5,11 +5,13 @@ import msvcrt
 
 class SimpleCave:
     def __init__(self, width=30, height=15):
-        seed_value = input("Введите сид (или пусто для рандома): ")
-        if seed_value:
-            random.seed(seed_value)
+        seed_input = input("Введите сид (или пусто для рандома): ")
+        if seed_input:
+            self.current_seed = seed_input
         else:
-            pass
+            self.current_seed = str(random.randint(1000, 9999))
+
+        random.seed(self.current_seed)
 
         os.system("")
         self.width = width
@@ -70,7 +72,7 @@ class SimpleCave:
 
         if self.depth % 15 == 0:
             self.timer = 40
-            self.message = "\033[41⚠️ НЕСТАБИЛЬНАЯ ЗОНА! УСПЕЙ ВЫЙТИ! ⚠️\033[0m"
+            self.message = "\033[41m⚠️ НЕСТАБИЛЬНАЯ ЗОНА! УСПЕЙ ВЫЙТИ! ⚠️\033[0m"
         else:
             self.timer = -1
 
