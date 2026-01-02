@@ -32,6 +32,7 @@ class SimpleCave:
         self.bonus_deep = False
         self.bonus_slime = False
         self.bonus_view = False
+        self.d20dice = False
         self.generate_level()
 
     def generate_level(self):
@@ -262,8 +263,22 @@ class SimpleCave:
                     elif code == "view" and self.bonus_view == False:
                         self.bonus_view = not self.bonus_view
                         self.message = "\033[35mНа 1 ход пещера освещена!\033[0m"
+                    elif code == "d20" and self.d20dice == False:
+                        self.d20dice = True
+                        roll = random.randint(1, 20)
+                        print(f"🎲 Кубик катится... Выпало: {roll}!")
+                        if roll == 20:
+                            self.message = "\033[32m🌟 КРИТИЧЕСКИЙ УСПЕХ! Вы нашли выход!\033[0m"
+                            self.depth += 1
+                            self.generate_level()
+                            print("\033[2J", end="")
+                        elif roll == 1:
+                            self.health = 0
+                            self.message = "\033[31m💀 КРИТИЧЕСКИЙ ПРОВАЛ! Файрбол прилетел вам в попу!\033[0m"
+                        else:
+                            self.message = f"🎲 Выпало {roll}. Ничего не произошло!"
                     elif code == "list":
-                        self.message = "\033[33mСписок читов: bee42, slimepack, starterpack, deep, view\033[0m"
+                        self.message = "\033[33mСписок читов: bee42, slimepack, starterpack, deep, view, d20\033[0m"
                     else:
                         self.message = "\033[5;31mНеверный код...\033[0m \033[33mВведите list для списка читов\033[0m"
                     print("\033[2J", end="")
