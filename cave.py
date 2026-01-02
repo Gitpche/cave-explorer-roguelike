@@ -6,10 +6,7 @@ import msvcrt
 class SimpleCave:
     def __init__(self, width=30, height=15):
         seed_input = input("\033[90mВведите сид (или пусто для рандома): \033[0m")
-        if seed_input:
-            self.current_seed = seed_input
-        else:
-            self.current_seed = str(random.randint(1000, 9999))
+        self.current_seed = seed_input if seed_input else str(random.randint(1000, 9999))
 
         random.seed(self.current_seed)
 
@@ -199,7 +196,7 @@ class SimpleCave:
             f"--- \033[36mГлубина: {self.depth}\033[0m | "
             f"{hp_info}{time_info} | "
             f"\033[32mСлизь: {self.slime_count}\033[0m | "
-            f"\033[35m{status}\033[0m ---")
+            f"\033[35m{status}\033[0m | \033[90mСид: {self.current_seed}\033[0m ---")
 
         view_distance = 6
 
