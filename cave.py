@@ -109,6 +109,9 @@ class SimpleCave:
         for i in range(len(self.enemies)):
             ex, ey, m_type = self.enemies[i]
 
+            if m_type == "O" and random.random() < 0.5:
+                continue
+
             dx = 1 if ex < self.px else -1 if ex > self.px else 0
             dy = 1 if ey < self.py else -1 if ey > self.py else 0
             nx, ny = ex + dx, ey + dy
@@ -131,10 +134,11 @@ class SimpleCave:
 
         nx, ny = self.px + dx, self.py + dy
         if 0 <= nx < self.width and 0 <= ny < self.height:
-            if [nx, ny, 'X'] in self.enemies or [nx, ny, 'O'] in self.enemies:
-                target = next(en for en in self.enemies if en[0] == nx and en[1] == ny)
-                m_type = target[2]
 
+            target = next((en for en in self.enemies if en[0] == nx and en[1] == ny), None)
+
+            if target:
+                m_type = target[2]
                 self.enemies.remove(target)
 
                 if m_type == "O":
@@ -146,13 +150,14 @@ class SimpleCave:
 
                 if random.random() > 0.4:
                     self.health -= self.monster_damage
+
             elif [nx, ny] in self.slimes:
                 self.slimes.remove([nx, ny])
                 self.slime_count += 1
                 self.message = "\033[32m✨ Слизь собрана.\033[0m"
+
             elif self.map[ny][nx] != "#":
                 self.px, self.py = nx, ny
-
                 if [self.px, self.py] in self.traps:
                     self.health -= 2.0
                     self.traps.remove([self.px, self.py])
