@@ -5,7 +5,7 @@ import msvcrt
 
 class SimpleCave:
     def __init__(self, width=30, height=15):
-        seed_input = input("Введите сид (или пусто для рандома): ")
+        seed_input = input("\033[90mВведите сид (или пусто для рандома): \033[0m")
         if seed_input:
             self.current_seed = seed_input
         else:
