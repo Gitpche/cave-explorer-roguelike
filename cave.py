@@ -149,7 +149,7 @@ class SimpleCave:
                     self.slimes.append([nx, ny])
                     self.message = "\033[31m⚔️ Монстр убит!\033[0m"
 
-                if random.random() > 0.4:
+                if random.random() > 0.6:
                     self.health -= self.monster_damage
 
             elif [nx, ny] in self.slimes:
@@ -281,7 +281,7 @@ class SimpleCave:
                         self.generate_level()
                         self.message = "⚡ Код принят! \033[35mПогружение вниз на 5 уровней!\033[0m"
                     elif code == "view" and self.bonus_view == False:
-                        self.bonus_view = not self.bonus_view
+                        self.bonus_view = True
                         self.message = "\033[35mНа 1 ход пещера освещена!\033[0m"
                     elif code == "list":
                         self.message = "\033[33mСписок читов: bee42, slimepack, starterpack, deep, view\033[0m"
