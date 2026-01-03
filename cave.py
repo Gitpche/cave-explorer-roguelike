@@ -1,7 +1,25 @@
 import random
 import os
-import msvcrt
+import sys
 
+def get_key():
+    if os.name == 'nt':
+        import msvcrt
+        char = msvcrt.getch()
+        if char in [b'\x00', b'\xe0']:
+            return msvcrt.getch().decode('utf-8', errors='ignore')
+        return char.decode('utf-8', errors='ignore').lower()
+    else:
+        import tty
+        import termios
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(fd)
+            ch = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        return ch.lower()
 
 class SimpleCave:
     def __init__(self, width=30, height=15):
@@ -246,7 +264,10 @@ class SimpleCave:
         while True:
             self.draw()
             try:
-                cmd = msvcrt.getch().decode('utf-8').lower()
+                cmd = get_key()
+
+                if not cmd:
+                    continue
 
                 if cmd in 'wasd':
                     d = {'w': (0, -1), 's': (0, 1), 'a': (-1, 0), 'd': (1, 0)}
@@ -303,6 +324,7 @@ if __name__ == "__main__":
     print(logo)
     print("      CAVE EXPLORER v2.0")
     print("===============================\033[0m")
-    msvcrt.getch()
+    print("Нажмите любую кнопку чтобы продолжить\n")
+    get_key()
     game = SimpleCave()
     game.run()
