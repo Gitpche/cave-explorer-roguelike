@@ -141,7 +141,9 @@ class SimpleCave:
                 self.enemies.remove(target)
 
                 if m_type == "O":
-                    for _ in range(4): self.slimes.append([nx, ny])
+                    for sx, sy in [(nx, ny - 1), (nx, ny + 1), (nx - 1, ny), (nx + 1, ny)]:
+                        if 0 <= sx < self.width and 0 <= sy < self.height:
+                            if self.map[sy][sx] == ".": self.slimes.append([sx, sy])
                     self.message = "\033[32m✨ ГИГАНТСКИЙ СЛИЗЕНЬ РАЗОРВАН! +4 слизи!\033[0m"
                 else:
                     self.slimes.append([nx, ny])
