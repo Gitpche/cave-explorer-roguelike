@@ -337,7 +337,7 @@ if __name__ == "__main__":
     print(logo)
     print("      CAVE EXPLORER v2.0")
     print("===============================\033[0m")
-    print("Нажмите любую кнопку чтобы продолжить\n")
+    print("\033[35mНажмите любую кнопку чтобы продолжить\033[0m\n")
     get_key()
     game = SimpleCave()
     game.run()
