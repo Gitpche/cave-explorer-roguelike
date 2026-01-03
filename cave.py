@@ -2,6 +2,19 @@ import random
 import os
 import sys
 
+player = "@"
+floor = "."
+wall = "#"
+escape = "E"
+gate = "F"
+artifact = "A"
+trap = "^"
+monster = "X"
+slimemonster = "O"
+slime = "o"
+
+
+
 def get_key():
     if os.name == 'nt':
         import msvcrt
@@ -56,14 +69,14 @@ class SimpleCave:
         self.enemies = []
         self.slimes = []
         self.traps = []
-        self.map = [["#" for _ in range(self.width)] for _ in range(self.height)]
+        self.map = [[wall for _ in range(self.width)] for _ in range(self.height)]
         x, y = random.randint(1, self.width - 2), random.randint(1, self.height - 2)
         self.px, self.py = x, y
         steps = (self.width * self.height) // 3
         floor_tiles = []
         while steps > 0:
-            if self.map[y][x] == "#":
-                self.map[y][x] = "."
+            if self.map[y][x] == wall:
+                self.map[y][x] = floor
                 floor_tiles.append((x, y))
                 steps -= 1
             dx, dy = random.choice([(0, 1), (0, -1), (1, 0), (-1, 0)])
@@ -71,18 +84,18 @@ class SimpleCave:
                 x, y = x + dx, y + dy
 
         if self.depth > 0 and self.depth % 10 == 0:
-            self.map[y][x] = "A"
+            self.map[y][x] = artifact
         elif self.depth == 4:
-            self.map[y][x] = "F"
+            self.map[y][x] = gate
         else:
-            self.map[y][x] = "E"
+            self.map[y][x] = escape
 
         if self.monsters_activated and self.depth >= 5:
             for _ in range(3):
                 if not floor_tiles: break
                 mx, my = random.choice(floor_tiles)
                 if (mx, my) != (self.px, self.py):
-                    m_type = "O" if random.random() < 0.2 else "X"
+                    m_type = slimemonster if random.random() < 0.2 else monster
                     self.enemies.append([mx, my, m_type])
 
         if self.depth % 15 == 0:
@@ -126,7 +139,7 @@ class SimpleCave:
         for i in range(len(self.enemies)):
             ex, ey, m_type = self.enemies[i]
 
-            if m_type == "O" and random.random() < 0.5:
+            if m_type == slimemonster and random.random() < 0.5:
                 continue
 
             dx = 1 if ex < self.px else -1 if ex > self.px else 0
@@ -136,7 +149,7 @@ class SimpleCave:
             if nx == self.px and ny == self.py:
                 self.health -= self.monster_damage
                 self.message = f"\033[31m💥 Монстр укусил вас! -{self.monster_damage} HP\033[0m"
-            elif self.map[ny][nx] == "." and not any(en[0] == nx and en[1] == ny for en in self.enemies):
+            elif self.map[ny][nx] == floor and not any(en[0] == nx and en[1] == ny for en in self.enemies):
                 self.enemies[i] = [nx, ny, m_type]
 
     def move(self, dx, dy):
@@ -158,10 +171,10 @@ class SimpleCave:
                 m_type = target[2]
                 self.enemies.remove(target)
 
-                if m_type == "O":
+                if m_type == slimemonster:
                     for sx, sy in [(nx, ny - 1), (nx, ny + 1), (nx - 1, ny), (nx + 1, ny)]:
                         if 0 <= sx < self.width and 0 <= sy < self.height:
-                            if self.map[sy][sx] == ".": self.slimes.append([sx, sy])
+                            if self.map[sy][sx] == floor: self.slimes.append([sx, sy])
                     self.message = "\033[32m✨ ГИГАНТСКИЙ СЛИЗЕНЬ РАЗОРВАН! +4 слизи!\033[0m"
                 else:
                     self.slimes.append([nx, ny])
@@ -175,7 +188,7 @@ class SimpleCave:
                 self.slime_count += 1
                 self.message = "\033[32m✨ Слизь собрана.\033[0m"
 
-            elif self.map[ny][nx] != "#":
+            elif self.map[ny][nx] != wall:
                 self.px, self.py = nx, ny
                 if [self.px, self.py] in self.traps:
                     self.health -= 2.0
@@ -183,11 +196,11 @@ class SimpleCave:
                     self.message = "\033[31m⚠️ КРАК! Вы наступили на шипы! -2.0 HP\033[0m"
 
                 tile = self.map[self.py][self.px]
-                if tile == "A":
+                if tile == artifact:
                     self.collect_artifact()
                     return
-                elif tile in ["F", "E"]:
-                    if tile == "F": self.monsters_activated = True
+                elif tile in [gate, escape]:
+                    if tile == gate: self.monsters_activated = True
                     self.depth += 1
                     self.generate_level()
                     return
@@ -231,23 +244,23 @@ class SimpleCave:
 
                 tile = self.map[y][x]
                 if x == self.px and y == self.py:
-                    row += "\033[35m@\033[0m"
+                    row += f"\033[35m{player}\033[0m"
                 elif any(en[0] == x and en[1] == y for en in self.enemies):
                     m_type = next(en[2] for en in self.enemies if en[0] == x and en[1] == y)
-                    if m_type == "O":
-                        row += "\033[1;32mO\033[0m"
+                    if m_type == slimemonster:
+                        row += f"\033[1;32m{slimemonster}\033[0m"
                     else:
-                        row += "\033[31mX\033[0m"
+                        row += f"\033[31m{monster}\033[0m"
                 elif [x, y] in self.slimes:
-                    row += "\033[32mo\033[0m"
+                    row += f"\033[32m{slime}\033[0m"
                 elif [x, y] in self.traps:
-                    row += "\033[33m^\033[0m"
-                elif self.map[y][x] == "A":
-                    row += "\033[33mA\033[0m"
-                elif tile in ["E", "F"]:
+                    row += f"\033[33m{trap}\033[0m"
+                elif self.map[y][x] == artifact:
+                    row += f"\033[33m{artifact}\033[0m"
+                elif tile in [escape, gate]:
                     row += f"\033[34m{tile}\033[0m"
-                elif tile == "#":
-                    row += f"\033[90m#\033[0m"
+                elif tile == wall:
+                    row += f"\033[90m{wall}\033[0m"
                 else:
                     row += self.map[y][x]
             print(row + "\033[K")
