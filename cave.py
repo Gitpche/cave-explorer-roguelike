@@ -323,8 +323,14 @@ class SimpleCave:
                         self.message = "\033[5;31mНеверный код...\033[0m \033[33mВведите list для списка читов\033[0m"
                     print("\033[2J", end="")
                 elif cmd == 'q':
-                    print("\033[?25h")
-                    break
+                    self.message = "\033[91mВыйти? (y/n)\033[0m"
+                    self.draw()
+                    confirm = get_key()
+                    if confirm == 'y':
+                        print("\033[?25h")
+                        break
+                    else:
+                        self.message = "Продолжаем путь!"
             except Exception:
                 continue
 
