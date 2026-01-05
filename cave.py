@@ -344,7 +344,6 @@ class SimpleCave:
 
 if __name__ == "__main__":
     logo = r"( /\ \/ [-   [- >< |^ |_ () /? [- /?"
-    title = "Cave"
 
     print("\033[2J\033[H", end="")
     print("\033[36m===============================")
