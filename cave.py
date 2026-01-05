@@ -36,6 +36,8 @@ def get_key():
 
 class SimpleCave:
     def __init__(self, width=30, height=15):
+        self.set_window_title('Cave Explorer')
+
         seed_input = input("\033[90mВведите сид (или пусто для рандома): \033[0m")
         self.current_seed = seed_input if seed_input else str(random.randint(1000, 9999))
 
@@ -335,8 +337,14 @@ class SimpleCave:
                 continue
 
 
+    def set_window_title(self, title):
+        sys.stdout.write(f"\033]2;{title}\a")
+        sys.stdout.flush()
+
+
 if __name__ == "__main__":
     logo = r"( /\ \/ [-   [- >< |^ |_ () /? [- /?"
+    title = "Cave"
 
     print("\033[2J\033[H", end="")
     print("\033[36m===============================")
